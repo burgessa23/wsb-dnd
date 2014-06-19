@@ -150,9 +150,9 @@ p {
 
     <!-- <p id="p1" class="draggable" style="top: 20px; left: 120px;">Hello world how are you today?</p> -->
 
-    <div id="img1" class="draggable image" style="-webkit-filter: invert(1);">img1</div>
+    <div id="img1" class="draggable image red" style="-webkit-filter: invert(1);">img1</div>
 
-    <div id="img2" class="draggable image" style="top: 150px;opacity:.5;">img2</div>
+    <div id="img2" class="draggable image blue" style="top: 150px;opacity:.5;">img2</div>
 
     <!-- <p id="p2" class="draggable" style="font-size:22px; left:100px;top:100px;background-color:#ccc;color:#0f0">DRAG ME AROUND</p> -->
 
@@ -302,7 +302,7 @@ $(function () {
 
         },
         stop: function (event, ui) {
-            $("#guide-v, #guide-h").hide();
+            //$("#guide-v, #guide-h").hide();
         }
     });
 
@@ -322,23 +322,33 @@ $(function () {
 	    collisionVisualDebug: true
 	});
 
+	// $('.draggable').draggable( {multipleCollisionInteractions:
+	//     [ { collider:  ".red", obstacle:  ".blue", preventCollision: true, preventProtrusion: true, containment: "#tabula", collisionVisualDebug: true },
+	//       { collider: ".blue", obstacle: ".red", preventCollision: true, preventProtrusion: true, containment: "#tabula", collisionVisualDebug: true  }
+	//     ]
+	//   });
+
 	$('.draggable').bind(
       "collision",
       function(event,ui) {
+      	console.log(ui);
+        console.log('guide-h top: '+$("#guide-h").css('top'));
+        console.log('guide-v left: '+$("#guide-v").css('left'));
         // $(this) is the draggable
         // event is one of the below types, see them for details and event.* contents
         // ui is the same as in "drag" et al
-        if (ui.offset.top - ui.position.top > -10 && ui.offset.top - ui.position.top < 10) {
+        if (ui.offset.top - ui.position.top > -MIN_DISTANCE && ui.offset.top - ui.position.top < MIN_DISTANCE) {
         	console.log('skipping');
+        } else if (ui.position.top === parseInt($("#guide-h").css('top')) && ui.position.left === parseInt($("#guide-v").css('left'))) {
+        	console.log('skipping - center or below right snap');
         } else {
         	$(this).css({'top': ui.offset.top});
         }
-        if (ui.offset.left - ui.position.left > -10 && ui.offset.left - ui.position.left < 10) {
+        if (ui.offset.left - ui.position.left > -MIN_DISTANCE && ui.offset.left - ui.position.left < MIN_DISTANCE) {
         	console.log('skipping');
         } else {
         	$(this).css({'left': ui.offset.left});
         }
-        console.log(ui);
       }
     );
 

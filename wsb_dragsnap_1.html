@@ -314,6 +314,14 @@ $(function () {
 	    collisionVisualDebug: true
 	});
 
+	$("#img2").draggable({
+	    obstacle: "#img1",
+	    preventCollision: true,
+	    preventProtrusion: true,
+	    containment: "#tabula",
+	    collisionVisualDebug: true
+	});
+
 	$('.draggable').bind(
       "collision",
       function(event,ui) {

@@ -11,8 +11,8 @@
     <link href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.min.css" rel="stylesheet" type="text/css" />
     <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
     <script src="http://code.jquery.com/ui/1.8.18/jquery-ui.min.js"></script>
-    <script src="http://eruciform.com/static/jquidragcollide/jquery-collision.js"></script>
-    <script src="http://eruciform.com/static/jquidragcollide/jquery-ui-draggable-collision.js"></script>
+    <script src="jquery-collision.min.js"></script>
+    <script src="jquery-ui-draggable-collision.min.js"></script>
     <meta charset="utf-8">
     <title>JS Bin</title>
 
@@ -310,47 +310,56 @@ $(function () {
 	    obstacle: "#img2",
 	    preventCollision: true,
 	    preventProtrusion: true,
-	    containment: "#tabula",
-	    collisionVisualDebug: true
+	    directionData: "ddata"
+	    //containment: "#tabula",
+	    //collisionVisualDebug: true
 	});
 
 	$("#img2").draggable({
 	    obstacle: "#img1",
 	    preventCollision: true,
 	    preventProtrusion: true,
-	    containment: "#tabula",
-	    collisionVisualDebug: true
+	    directionData: "ddata"
+	    //containment: "#tabula",
+	    //collisionVisualDebug: true
 	});
 
-	// $('.draggable').draggable( {multipleCollisionInteractions:
-	//     [ { collider:  ".red", obstacle:  ".blue", preventCollision: true, preventProtrusion: true, containment: "#tabula", collisionVisualDebug: true },
-	//       { collider: ".blue", obstacle: ".red", preventCollision: true, preventProtrusion: true, containment: "#tabula", collisionVisualDebug: true  }
-	//     ]
-	//   });
+	function handleCollision(event,ui) {
 
-	$('.draggable').bind(
-      "collision",
-      function(event,ui) {
-      	console.log(ui);
-        console.log('guide-h top: '+$("#guide-h").css('top'));
-        console.log('guide-v left: '+$("#guide-v").css('left'));
-        // $(this) is the draggable
-        // event is one of the below types, see them for details and event.* contents
-        // ui is the same as in "drag" et al
-        if (ui.offset.top - ui.position.top > -MIN_DISTANCE && ui.offset.top - ui.position.top < MIN_DISTANCE) {
-        	console.log('skipping');
+        	var d = $(this).data("ddata");
+        	console.log(d);
+
+
+
+        console.log(ui);
+      	console.log(event);
+        console.log('guide-h top: '+parseInt($("#guide-h").css('top')));
+        console.log('guide-v left: '+parseInt($("#guide-v").css('left')));
+
+        var d = $(event).data("ddata");
+
+        var guideHTop = parseInt($("#guide-h").css('top'));
+        var guideVLeft = parseInt($("#guide-v").css('left'));
+        var centeredTopOffset = parseInt(ui.position.top + ui.helper[0].clientHeight / 2 );
+        var centeredLeftOffset = parseInt(ui.position.left + ui.helper[0].clientWidth/2 );
+
+        if (Math.abs(ui.offset.top - ui.position.top) < MIN_DISTANCE) {
+        	console.log('skipping - top');
         } else if (ui.position.top === parseInt($("#guide-h").css('top')) && ui.position.left === parseInt($("#guide-v").css('left'))) {
         	console.log('skipping - center or below right snap');
+        } else if (Math.abs(guideHTop - centeredTopOffset) < MIN_DISTANCE) {
+        	console.log('skipping - center overlay');
         } else {
         	$(this).css({'top': ui.offset.top});
         }
-        if (ui.offset.left - ui.position.left > -MIN_DISTANCE && ui.offset.left - ui.position.left < MIN_DISTANCE) {
-        	console.log('skipping');
+        if (Math.abs(ui.offset.left - ui.position.left) < MIN_DISTANCE) {
+        	console.log('skipping - left');
         } else {
         	$(this).css({'left': ui.offset.left});
         }
-      }
-    );
+    }
+
+	$('.draggable').bind("collision", handleCollision);
 
 
     $(".draggable").resizable({
